@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
 import '../models/receipt_models.dart';
+import '../services/rasterizer_service.dart';
 
-class SettingsDialog extends StatelessWidget {
+class SettingsDialog extends StatefulWidget {
   final PaperWidth paperWidth;
   final Function(PaperWidth) onPaperWidthChange;
   final ReceiptFontFamily fontFamily;
   final Function(ReceiptFontFamily) onFontFamilyChange;
   final VoidCallback onReplayOnboarding;
+  final int concentration;
+  final Function(int) onConcentrationChange;
+  final DitherMode ditherMode;
+  final Function(DitherMode) onDitherModeChange;
+  final int threshold;
+  final Function(int) onThresholdChange;
+  final double contrast;
+  final Function(double) onContrastChange;
 
   const SettingsDialog({
     super.key,
@@ -15,7 +24,60 @@ class SettingsDialog extends StatelessWidget {
     required this.fontFamily,
     required this.onFontFamilyChange,
     required this.onReplayOnboarding,
+    this.concentration = 5,
+    required this.onConcentrationChange,
+    this.ditherMode = DitherMode.threshold,
+    required this.onDitherModeChange,
+    this.threshold = 138,
+    required this.onThresholdChange,
+    this.contrast = 1.15,
+    required this.onContrastChange,
   });
+
+  @override
+  State<SettingsDialog> createState() => _SettingsDialogState();
+}
+
+class _SettingsDialogState extends State<SettingsDialog> {
+  late int _concentration;
+  late DitherMode _ditherMode;
+  late int _threshold;
+  late double _contrast;
+
+  @override
+  void initState() {
+    super.initState();
+    _concentration = widget.concentration;
+    _ditherMode = widget.ditherMode;
+    _threshold = widget.threshold;
+    _contrast = widget.contrast;
+  }
+
+  String _ditherModeLabel(DitherMode mode) {
+    switch (mode) {
+      case DitherMode.threshold:
+        return 'Threshold';
+      case DitherMode.floydSteinberg:
+        return 'Floyd-Steinberg';
+      case DitherMode.atkinson:
+        return 'Atkinson';
+      case DitherMode.adaptive:
+        return 'Adaptive';
+    }
+  }
+
+  String _ditherModeDescription(DitherMode mode) {
+    switch (mode) {
+      case DitherMode.threshold:
+        return 'Best for text — sharp edges, no halftone';
+      case DitherMode.floydSteinberg:
+        return 'Best for photos — smooth gradient halftone';
+      case DitherMode.atkinson:
+        return 'Crisp halftone — ideal for line art and logos';
+      case DitherMode.adaptive:
+        return 'Mixed content — auto-adjusts per row';
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +89,7 @@ class SettingsDialog extends StatelessWidget {
       ),
       insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 440, maxHeight: 600),
+        constraints: const BoxConstraints(maxWidth: 440, maxHeight: 680),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -52,7 +114,7 @@ class SettingsDialog extends StatelessWidget {
                       ),
                       SizedBox(height: 2),
                       Text(
-                        'Thermi - Your Thermal Printer OS',
+                        'Thermi — Your Thermal Printer OS',
                         style: TextStyle(
                           fontSize: 11,
                           color: Color(0xFFA1A1AA),
@@ -75,7 +137,7 @@ class SettingsDialog extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 children: [
                   // Section: Hardware & Calibration
-                  _buildSectionHeader('HARDWARE & PRINT CALIBRATION'),
+                  _buildSectionHeader('HARDWARE & PAPER'),
                   const SizedBox(height: 8),
 
                   _buildSettingCard(
@@ -86,9 +148,9 @@ class SettingsDialog extends StatelessWidget {
                         ButtonSegment(value: PaperWidth.mm58, label: Text('58mm', style: TextStyle(fontSize: 11))),
                         ButtonSegment(value: PaperWidth.mm80, label: Text('80mm', style: TextStyle(fontSize: 11))),
                       ],
-                      selected: {paperWidth},
+                      selected: {widget.paperWidth},
                       onSelectionChanged: (set) {
-                        if (set.isNotEmpty) onPaperWidthChange(set.first);
+                        if (set.isNotEmpty) widget.onPaperWidthChange(set.first);
                       },
                       style: ButtonStyle(
                         visualDensity: VisualDensity.compact,
@@ -108,14 +170,135 @@ class SettingsDialog extends StatelessWidget {
                     ),
                   ),
 
+                  const SizedBox(height: 18),
+
+                  // Section: Print Quality Engine
+                  _buildSectionHeader('PRINT QUALITY ENGINE'),
+                  const SizedBox(height: 8),
+
+                  // Concentration Level
+                  _buildSettingCard(
+                    title: 'Print Density (Concentration)',
+                    subtitle: 'Level $_concentration — ${_concentration >= 4 ? "Deep black" : _concentration >= 3 ? "Standard" : "Light"}',
+                    trailing: SizedBox(
+                      width: 120,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Slider(
+                              value: _concentration.toDouble(),
+                              min: 1,
+                              max: 5,
+                              divisions: 4,
+                              activeColor: const Color(0xFFF59E0B),
+                              inactiveColor: const Color(0xFF27272A),
+                              onChanged: (val) {
+                                setState(() => _concentration = val.round());
+                                widget.onConcentrationChange(_concentration);
+                              },
+                            ),
+                          ),
+                          Text(
+                            '$_concentration',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFF59E0B)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
                   const SizedBox(height: 10),
 
+                  // Dithering Algorithm
+                  _buildSettingCard(
+                    title: 'Dithering Algorithm',
+                    subtitle: _ditherModeDescription(_ditherMode),
+                    trailing: DropdownButton<DitherMode>(
+                      value: _ditherMode,
+                      dropdownColor: const Color(0xFF18181B),
+                      underline: const SizedBox(),
+                      style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
+                      onChanged: (val) {
+                        if (val != null) {
+                          setState(() => _ditherMode = val);
+                          widget.onDitherModeChange(val);
+                        }
+                      },
+                      items: DitherMode.values.map((mode) {
+                        return DropdownMenuItem(
+                          value: mode,
+                          child: Text(_ditherModeLabel(mode)),
+                        );
+                      }).toList(),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Threshold
                   _buildSettingCard(
                     title: 'Binarization Threshold',
-                    subtitle: 'Calibrated 138 with 1.15 contrast ratio',
-                    trailing: const Text(
-                      'High Density',
-                      style: TextStyle(fontSize: 11, color: Color(0xFF10B981), fontWeight: FontWeight.bold),
+                    subtitle: '$_threshold / 255 — ${_threshold > 140 ? "Darker output" : _threshold < 120 ? "Lighter output" : "Balanced"}',
+                    trailing: SizedBox(
+                      width: 120,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Slider(
+                              value: _threshold.toDouble(),
+                              min: 80,
+                              max: 200,
+                              divisions: 24,
+                              activeColor: const Color(0xFFF59E0B),
+                              inactiveColor: const Color(0xFF27272A),
+                              onChanged: (val) {
+                                setState(() => _threshold = val.round());
+                                widget.onThresholdChange(_threshold);
+                              },
+                            ),
+                          ),
+                          Text(
+                            '$_threshold',
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFF59E0B)),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  // Contrast
+                  _buildSettingCard(
+                    title: 'Contrast Enhancement',
+                    subtitle: '${_contrast.toStringAsFixed(2)}x — ${_contrast > 1.2 ? "High contrast" : _contrast < 1.0 ? "Soft" : "Calibrated"}',
+                    trailing: SizedBox(
+                      width: 120,
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Expanded(
+                            child: Slider(
+                              value: _contrast,
+                              min: 0.5,
+                              max: 2.0,
+                              divisions: 15,
+                              activeColor: const Color(0xFFF59E0B),
+                              inactiveColor: const Color(0xFF27272A),
+                              onChanged: (val) {
+                                setState(() => _contrast = double.parse(val.toStringAsFixed(2)));
+                                widget.onContrastChange(_contrast);
+                              },
+                            ),
+                          ),
+                          Text(
+                            _contrast.toStringAsFixed(1),
+                            style: const TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Color(0xFFF59E0B)),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
 
@@ -140,12 +323,12 @@ class SettingsDialog extends StatelessWidget {
                     title: 'Default Font Family',
                     subtitle: 'Thermal head rendering style',
                     trailing: DropdownButton<ReceiptFontFamily>(
-                      value: fontFamily,
+                      value: widget.fontFamily,
                       dropdownColor: const Color(0xFF18181B),
                       underline: const SizedBox(),
                       style: const TextStyle(fontSize: 11, color: Colors.white, fontWeight: FontWeight.bold),
                       onChanged: (val) {
-                        if (val != null) onFontFamilyChange(val);
+                        if (val != null) widget.onFontFamilyChange(val);
                       },
                       items: const [
                         DropdownMenuItem(value: ReceiptFontFamily.mono, child: Text('Mono POS')),
@@ -165,7 +348,7 @@ class SettingsDialog extends StatelessWidget {
                     trailing: TextButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        onReplayOnboarding();
+                        widget.onReplayOnboarding();
                       },
                       style: TextButton.styleFrom(
                         visualDensity: VisualDensity.compact,
@@ -204,7 +387,7 @@ class SettingsDialog extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              'v1.3.0',
+                              'v1.4.0',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
@@ -335,4 +518,3 @@ class SettingsDialog extends StatelessWidget {
     );
   }
 }
-

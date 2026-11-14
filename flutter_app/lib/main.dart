@@ -57,6 +57,10 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
   bool _isPrinting = false;
   double _printProgress = 0.0;
   bool _isPreviewMode = false;
+  int _concentration = 5;
+  DitherMode _ditherMode = DitherMode.threshold;
+  int _threshold = 138;
+  double _contrast = 1.15;
 
   final List<ReceiptBlock> _blocks = [];
 
@@ -297,14 +301,18 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
       final targetWidth = _paperWidth.dots;
       final scaled = img.copyResize(decoded, width: targetWidth);
 
-      // Grayscale & high contrast adjustment
+      // Grayscale & calibrated contrast adjustment matching Capacitor print engine
       final grayscale = img.grayscale(scaled);
-      img.adjustColor(grayscale, contrast: 1.3);
+      img.adjustColor(grayscale, contrast: 1.15);
 
       final pngBytes = Uint8List.fromList(img.encodePng(grayscale));
 
       setState(() {
         block.imageBytes = pngBytes;
+        // Auto-select Floyd-Steinberg dithering for crisp photo output
+        if (_ditherMode == DitherMode.threshold) {
+          _ditherMode = DitherMode.floydSteinberg;
+        }
       });
     } catch (e) {
       if (mounted) {
@@ -507,17 +515,28 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
     });
 
     try {
+      // Determine effective dithering algorithm:
+      // If receipt contains a photo and user kept default threshold, auto-use Floyd-Steinberg for halftone
+      final bool hasPhoto = _blocks.any((b) => b is ImageBlock && b.imageBytes != null);
+      final DitherMode effectiveMode = (hasPhoto && _ditherMode == DitherMode.threshold)
+          ? DitherMode.floydSteinberg
+          : _ditherMode;
+
       // 3. Capture live WYSIWYG paper to monochrome thermal raster dots
       final raster = await RasterizerService.captureReceiptToMono(
         _receiptKey,
         _paperWidth.dots,
+        ditherMode: effectiveMode,
+        threshold: _threshold,
+        contrast: _contrast,
       );
 
-      // 4. Stream raster bitstream with 50ms pacing
+      // 4. Stream raster bitstream with 50ms pacing and user-calibrated concentration
       final success = await _bleService.printMonoRaster(
         raster.monoBytes,
         raster.widthDots,
         raster.heightDots,
+        concentration: _concentration,
       );
 
       if (mounted) {
@@ -585,6 +604,14 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
                         onPaperWidthChange: (w) => setState(() => _paperWidth = w),
                         fontFamily: _fontFamily,
                         onFontFamilyChange: (f) => setState(() => _fontFamily = f),
+                        concentration: _concentration,
+                        onConcentrationChange: (c) => setState(() => _concentration = c),
+                        ditherMode: _ditherMode,
+                        onDitherModeChange: (m) => setState(() => _ditherMode = m),
+                        threshold: _threshold,
+                        onThresholdChange: (t) => setState(() => _threshold = t),
+                        contrast: _contrast,
+                        onContrastChange: (c) => setState(() => _contrast = c),
                         onReplayOnboarding: () {
                           showDialog(
                             context: context,

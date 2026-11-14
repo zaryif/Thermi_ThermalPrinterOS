@@ -269,7 +269,12 @@ class ThermalBleService {
   }
 
   /// Helper to send mono bytes via TinyPrintProtocol with exact Capacitor 177-byte pacing
-  Future<bool> printMonoRaster(Uint8List monoBytes, int widthDots, int heightDots) async {
+  Future<bool> printMonoRaster(
+    Uint8List monoBytes,
+    int widthDots,
+    int heightDots, {
+    int concentration = 5,
+  }) async {
     if (_writeCharacteristic == null || !isConnected) {
       return false;
     }
@@ -278,6 +283,7 @@ class ThermalBleService {
       monoBytes,
       widthDots,
       heightDots,
+      concentration: concentration,
     );
 
     _setStatus(BleStatus.printing);
