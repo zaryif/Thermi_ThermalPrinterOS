@@ -66,7 +66,7 @@ class TextBlock extends ReceiptBlock {
   TextBlock({
     required super.id,
     this.text = 'Tap here to write your note, quote, or reminder directly on the paper.',
-    this.fontSize = 14.0,
+    this.fontSize = 18.0,
     this.align = TextAlign.left,
     this.bold = false,
     this.inverted = false,

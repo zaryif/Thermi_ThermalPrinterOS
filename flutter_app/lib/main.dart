@@ -182,7 +182,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
             TextBlock(
               id: 'txt_sign',
               text: 'Audited & Logged by MD. ZARIF AZFAR.\nKeep receipt for monthly accounts.',
-              fontSize: 10,
+              fontSize: 14,
               align: TextAlign.center,
             ),
             GapBlock(id: 'gap_e3', height: 12),
@@ -205,7 +205,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
             TextBlock(
               id: 'txt_n1',
               text: '1. Verified high-density BLE packet framing.\n2. Calibrated 50ms chunk pacing prevents buffer overflow.\n3. Floyd-Steinberg error diffusion renders crisp photos.',
-              fontSize: 11,
+              fontSize: 15,
             ),
             GapBlock(id: 'gap_n2', height: 12),
             QuoteBlock(
