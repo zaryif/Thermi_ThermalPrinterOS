@@ -387,7 +387,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
                               ),
                             ),
                             Text(
-                              'v1.4.0',
+                              'v1.4.1',
                               style: TextStyle(
                                 fontSize: 11,
                                 fontWeight: FontWeight.bold,
