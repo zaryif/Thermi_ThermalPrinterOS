@@ -108,14 +108,14 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
         metaLeft: 'MD. ZARIF AZFAR',
         metaRight: 'STATUS: ACTIVE',
       ),
-      GapBlock(id: 'gap_1', height: 12),
+      GapBlock(id: 'gap_1', height: 6),
       QuoteBlock(
         id: 'qt_1',
         quote: 'Think & Change.',
         author: 'MD. ZARIF AZFAR',
         category: 'Vision',
       ),
-      GapBlock(id: 'gap_2', height: 12),
+      GapBlock(id: 'gap_2', height: 6),
       ScheduleBlock(
         id: 'sch_1',
         title: 'DAILY SCHEDULE',
@@ -126,7 +126,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
           ScheduleItem(id: 's3', time: '03:00 PM', title: 'Hardware Verification & Print'),
         ],
       ),
-      GapBlock(id: 'gap_3', height: 12),
+      GapBlock(id: 'gap_3', height: 6),
       TodoListBlock(
         id: 'td_1',
         title: 'ACTION PROTOCOL',
@@ -136,7 +136,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
           TodoItem(id: 't3', text: 'Verify responsive edge-to-edge canvas width'),
         ],
       ),
-      GapBlock(id: 'gap_4', height: 16),
+      GapBlock(id: 'gap_4', height: 8),
       DividerBlock(id: 'div_1', style: 'cut'),
       FeedBlock(id: 'fd_1', lines: 3),
     ]);
@@ -163,7 +163,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
               metaLeft: 'MD. ZARIF AZFAR',
               metaRight: 'AUDIT: VERIFIED',
             ),
-            GapBlock(id: 'gap_e1', height: 12),
+            GapBlock(id: 'gap_e1', height: 6),
             ExpenseBlock(
               id: 'exp_1',
               title: 'PURCHASE ITEMIZED LOG',
@@ -178,14 +178,14 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
               ],
               tax: 2.50,
             ),
-            GapBlock(id: 'gap_e2', height: 12),
+            GapBlock(id: 'gap_e2', height: 6),
             TextBlock(
               id: 'txt_sign',
               text: 'Audited & Logged by MD. ZARIF AZFAR.\nKeep receipt for monthly accounts.',
-              fontSize: 14,
+              fontSize: 12,
               align: TextAlign.center,
             ),
-            GapBlock(id: 'gap_e3', height: 12),
+            GapBlock(id: 'gap_e3', height: 6),
             DividerBlock(id: 'div_e', style: 'cut'),
             FeedBlock(id: 'fd_e', lines: 3),
           ]);
@@ -201,20 +201,20 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
               metaLeft: 'AUTHOR: MD. ZARIF AZFAR',
               metaRight: 'CONFIDENTIAL',
             ),
-            GapBlock(id: 'gap_n1', height: 12),
+            GapBlock(id: 'gap_n1', height: 6),
             TextBlock(
               id: 'txt_n1',
               text: '1. Verified high-density BLE packet framing.\n2. Calibrated 50ms chunk pacing prevents buffer overflow.\n3. Floyd-Steinberg error diffusion renders crisp photos.',
-              fontSize: 15,
+              fontSize: 13,
             ),
-            GapBlock(id: 'gap_n2', height: 12),
+            GapBlock(id: 'gap_n2', height: 6),
             QuoteBlock(
               id: 'qt_n',
               quote: 'Simplicity is prerequisite for reliability.',
               author: 'Edsger W. Dijkstra',
               category: 'Engineering',
             ),
-            GapBlock(id: 'gap_n3', height: 14),
+            GapBlock(id: 'gap_n3', height: 6),
             DividerBlock(id: 'div_n', style: 'cut'),
             FeedBlock(id: 'fd_n', lines: 3),
           ]);
@@ -230,7 +230,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
               metaLeft: 'MD. ZARIF AZFAR',
               metaRight: 'PRIORITY: HIGH',
             ),
-            GapBlock(id: 'gap_t1', height: 12),
+            GapBlock(id: 'gap_t1', height: 6),
             TodoListBlock(
               id: 'td_main',
               title: 'HIGH IMPACT TASKS',
@@ -241,7 +241,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
                 TodoItem(id: 't4', text: 'Deploy release to GitHub'),
               ],
             ),
-            GapBlock(id: 'gap_t2', height: 14),
+            GapBlock(id: 'gap_t2', height: 6),
             DividerBlock(id: 'div_t', style: 'cut'),
             FeedBlock(id: 'fd_t', lines: 3),
           ]);
@@ -257,7 +257,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
               metaLeft: 'MD. ZARIF AZFAR',
               metaRight: 'LEVEL 1 ALERT',
             ),
-            GapBlock(id: 'gap_i1', height: 12),
+            GapBlock(id: 'gap_i1', height: 6),
             ImportantBlock(
               id: 'imp_1',
               tag: 'CRITICAL / URGENT',
@@ -265,13 +265,13 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
               content: 'All Data Communication engineering laboratory reports (DC_Z_LT01 through LT04) must be bundled with 100% rubrics before the midnight deadline.',
               footer: 'VERIFIED & SIGNED BY MD. ZARIF AZFAR',
             ),
-            GapBlock(id: 'gap_i2', height: 12),
+            GapBlock(id: 'gap_i2', height: 6),
             QrCodeBlock(
               id: 'qr_imp',
-              data: 'https://github.com/zaryif/Thermal_printer',
+              data: 'https://github.com/zaryif/Thermi_ThermalPrinterOS',
               label: 'SCAN FOR SYSTEM REPO',
             ),
-            GapBlock(id: 'gap_i3', height: 12),
+            GapBlock(id: 'gap_i3', height: 6),
             DividerBlock(id: 'div_imp', style: 'cut'),
             FeedBlock(id: 'fd_imp', lines: 3),
           ]);
@@ -364,7 +364,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
         );
         break;
       case 'gap':
-        newBlock = GapBlock(id: newId, height: 16);
+        newBlock = GapBlock(id: newId, height: 8);
         break;
       case 'schedule':
         newBlock = ScheduleBlock(
@@ -415,7 +415,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
       case 'qrcode':
         newBlock = QrCodeBlock(
           id: newId,
-          data: 'https://github.com/zaryif/Thermal_printer',
+          data: 'https://github.com/zaryif/Thermi_ThermalPrinterOS',
           label: 'SCAN FOR INFO',
         );
         break;
@@ -488,11 +488,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
   }
 
   Future<void> _handlePrint() async {
-    // 1. Hide on-screen keyboard & blinking cursors
-    FocusScope.of(context).unfocus();
-    await Future.delayed(const Duration(milliseconds: 150));
-
-    // 2. If printer not connected, open BLE scanner immediately
+    // 1. If printer not connected, open BLE scanner immediately
     if (!_bleService.isConnected) {
       if (mounted) {
         showDialog(
@@ -509,10 +505,16 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
       return;
     }
 
+    // 2. Hide on-screen keyboard, clear block selection, and enter isPrinting clean mode
+    FocusScope.of(context).unfocus();
     setState(() {
+      _selectedBlockId = null;
       _isPrinting = true;
       _printProgress = 0.0;
     });
+
+    // Wait for the UI to rebuild without selection highlights, action pill overlay, or add buttons
+    await Future.delayed(const Duration(milliseconds: 150));
 
     try {
       // Determine effective dithering algorithm:
@@ -700,6 +702,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
                         onAddEventToSchedule: () {},
                         onAddTaskToTodo: () {},
                         isPreviewMode: _isPreviewMode,
+                        isPrinting: _isPrinting,
                       ),
 
                       // Streaming progress overlay

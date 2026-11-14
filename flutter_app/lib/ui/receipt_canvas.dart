@@ -17,6 +17,7 @@ class ReceiptCanvas extends StatelessWidget {
   final VoidCallback onAddEventToSchedule;
   final VoidCallback onAddTaskToTodo;
   final bool isPreviewMode;
+  final bool isPrinting;
 
   const ReceiptCanvas({
     super.key,
@@ -33,6 +34,7 @@ class ReceiptCanvas extends StatelessWidget {
     required this.onAddEventToSchedule,
     required this.onAddTaskToTodo,
     this.isPreviewMode = false,
+    this.isPrinting = false,
   });
 
   static const List<Map<String, String>> curatedQuotes = [
@@ -88,12 +90,14 @@ class ReceiptCanvas extends StatelessWidget {
     },
   ];
 
+  bool get isCleanMode => isPreviewMode || isPrinting;
+
   TextStyle getBaseTextStyle({
-    double fontSize = 18.0,
-    FontWeight fontWeight = FontWeight.normal,
+    double fontSize = 16.0,
+    FontWeight fontWeight = FontWeight.w600,
     FontStyle fontStyle = FontStyle.normal,
     Color color = const Color(0xFF09090B),
-    double height = 1.4,
+    double height = 1.35,
   }) {
     switch (fontFamily) {
       case ReceiptFontFamily.mono:
@@ -180,7 +184,10 @@ class ReceiptCanvas extends StatelessWidget {
                   key: receiptKey,
                   child: Container(
                     width: displayWidth,
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 22),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: isCleanMode ? 14 : 16,
+                      vertical: isCleanMode ? 16 : 20,
+                    ),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFAFAF9), // Off-white thermal stock
                       boxShadow: [
@@ -204,15 +211,15 @@ class ReceiptCanvas extends StatelessWidget {
                             Text(
                               'EMPTY RECEIPT',
                               style: getBaseTextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w900,
                                 color: Colors.grey.shade500,
                               ),
                             ),
                             const SizedBox(height: 4),
                             Text(
                               'Tap any template block above to start typing directly',
-                              style: getBaseTextStyle(fontSize: 15, color: Colors.grey.shade400),
+                              style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade400),
                             ),
                           ],
                         ),
@@ -221,13 +228,13 @@ class ReceiptCanvas extends StatelessWidget {
                       ...blocks.asMap().entries.map((entry) {
                         final int index = entry.key;
                         final ReceiptBlock block = entry.value;
-                        final bool isSelected = !isPreviewMode && block.id == selectedBlockId;
+                        final bool isSelected = !isCleanMode && block.id == selectedBlockId;
 
                         return GestureDetector(
-                          onTap: isPreviewMode ? null : () => onSelectBlock(block.id),
+                          onTap: isCleanMode ? null : () => onSelectBlock(block.id),
                           child: Container(
-                            margin: const EdgeInsets.symmetric(vertical: 4),
-                            padding: const EdgeInsets.all(4),
+                            margin: EdgeInsets.symmetric(vertical: isCleanMode ? 2 : 4),
+                            padding: EdgeInsets.all(isCleanMode ? 0 : 4),
                             decoration: BoxDecoration(
                               color: isSelected
                                   ? const Color(0xFFF59E0B).withValues(alpha: 0.08)
@@ -245,7 +252,7 @@ class ReceiptCanvas extends StatelessWidget {
                                 _buildBlockContent(block),
 
                                 // Block action overlay when selected
-                                if (isSelected)
+                                if (isSelected && !isCleanMode)
                                   Positioned(
                                     top: -12,
                                     right: 0,
@@ -324,7 +331,7 @@ class ReceiptCanvas extends StatelessWidget {
               child: Center(
                 child: Text(
                   '- - - - - - - - - - - - ✂ - - - - - - - - - - - -',
-                  style: getBaseTextStyle(fontSize: 15, color: Colors.grey.shade500),
+                  style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey.shade500),
                   overflow: TextOverflow.clip,
                 ),
               ),
@@ -346,11 +353,11 @@ class ReceiptCanvas extends StatelessWidget {
             maxLines: null,
             keyboardType: TextInputType.multiline,
             textAlign: TextAlign.center,
-            style: getBaseTextStyle(fontSize: 22, fontWeight: FontWeight.bold, height: 1.3),
+            style: getBaseTextStyle(fontSize: 20, fontWeight: FontWeight.w900, height: 1.25),
             decoration: const InputDecoration(
               isDense: true,
               border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(vertical: 3),
+              contentPadding: EdgeInsets.symmetric(vertical: 2),
             ),
             onChanged: (val) {
               block.title = val;
@@ -362,7 +369,7 @@ class ReceiptCanvas extends StatelessWidget {
             maxLines: null,
             keyboardType: TextInputType.multiline,
             textAlign: TextAlign.center,
-            style: getBaseTextStyle(fontSize: 16.5, fontWeight: FontWeight.w600, color: Colors.grey.shade700, height: 1.3),
+            style: getBaseTextStyle(fontSize: 14.5, fontWeight: FontWeight.bold, color: Colors.grey.shade800, height: 1.25),
             decoration: const InputDecoration(
               isDense: true,
               border: InputBorder.none,
@@ -376,7 +383,7 @@ class ReceiptCanvas extends StatelessWidget {
           TextFormField(
             initialValue: block.dateStr,
             textAlign: TextAlign.center,
-            style: getBaseTextStyle(fontSize: 15, color: Colors.grey.shade600),
+            style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
             decoration: const InputDecoration(
               isDense: true,
               border: InputBorder.none,
@@ -394,7 +401,7 @@ class ReceiptCanvas extends StatelessWidget {
               Expanded(
                 child: TextFormField(
                   initialValue: block.metaLeft,
-                  style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                   decoration: const InputDecoration(
                     isDense: true,
                     border: InputBorder.none,
@@ -410,7 +417,7 @@ class ReceiptCanvas extends StatelessWidget {
                 child: TextFormField(
                   initialValue: block.metaRight,
                   textAlign: TextAlign.right,
-                  style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.w600),
+                  style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.w700),
                   decoration: const InputDecoration(
                     isDense: true,
                     border: InputBorder.none,
@@ -439,14 +446,14 @@ class ReceiptCanvas extends StatelessWidget {
           textAlign: block.align,
           style: getBaseTextStyle(
             fontSize: block.fontSize,
-            fontWeight: block.bold ? FontWeight.bold : FontWeight.normal,
+            fontWeight: block.bold ? FontWeight.w900 : FontWeight.w700,
             color: block.inverted ? Colors.white : const Color(0xFF09090B),
-            height: 1.45,
+            height: 1.35,
           ),
           decoration: const InputDecoration(
             isDense: true,
             border: InputBorder.none,
-            contentPadding: EdgeInsets.symmetric(vertical: 4, horizontal: 2),
+            contentPadding: EdgeInsets.symmetric(vertical: 2, horizontal: 2),
           ),
           onChanged: (val) {
             block.text = val;
@@ -457,53 +464,57 @@ class ReceiptCanvas extends StatelessWidget {
     }
 
     if (block is ImageBlock) {
+      if (block.imageBytes == null) {
+        if (isCleanMode) {
+          return const SizedBox.shrink();
+        }
+        return InkWell(
+          onTap: () => onPickImage(block),
+          child: Container(
+            height: 110,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade100,
+              borderRadius: BorderRadius.circular(6),
+              border: Border.all(color: Colors.grey.shade400, style: BorderStyle.solid),
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.add_photo_alternate_outlined, size: 32, color: Colors.grey.shade600),
+                const SizedBox(height: 4),
+                Text(
+                  'Tap to Upload Photo',
+                  style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+                ),
+                Text(
+                  'Automatic thermal contrast & Floyd-Steinberg dither',
+                  style: getBaseTextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey.shade500),
+                ),
+              ],
+            ),
+          ),
+        );
+      }
       return Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          if (block.imageBytes == null)
-            InkWell(
-              onTap: () => onPickImage(block),
-              child: Container(
-                height: 120,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade100,
-                  borderRadius: BorderRadius.circular(6),
-                  border: Border.all(color: Colors.grey.shade400, style: BorderStyle.solid),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.add_photo_alternate_outlined, size: 36, color: Colors.grey.shade600),
-                    const SizedBox(height: 6),
-                    Text(
-                      'Tap to Upload Photo',
-                      style: getBaseTextStyle(fontSize: 17, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
-                    ),
-                    Text(
-                      'Automatic thermal contrast & Floyd-Steinberg dither',
-                      style: getBaseTextStyle(fontSize: 14, color: Colors.grey.shade500),
-                    ),
-                  ],
-                ),
-              ),
-            )
-          else ...[
-            ClipRRect(
-              borderRadius: BorderRadius.circular(4),
-              child: Image.memory(
-                block.imageBytes!,
-                width: double.infinity,
-                fit: BoxFit.contain,
-              ),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(2),
+            child: Image.memory(
+              block.imageBytes!,
+              width: double.infinity,
+              fit: BoxFit.contain,
             ),
-            const SizedBox(height: 4),
+          ),
+          if (!isCleanMode) ...[
+            const SizedBox(height: 2),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 TextButton.icon(
                   onPressed: () => onPickImage(block),
                   icon: const Icon(Icons.refresh, size: 12, color: Colors.black87),
-                  label: Text('Change Photo', style: getBaseTextStyle(fontSize: 14, color: Colors.black87)),
+                  label: Text('Change Photo', style: getBaseTextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.black87)),
                   style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(40, 20)),
                 ),
                 TextButton(
@@ -511,36 +522,37 @@ class ReceiptCanvas extends StatelessWidget {
                     block.imageBytes = null;
                     onUpdateBlock(block);
                   },
-                  child: Text('Clear Photo', style: getBaseTextStyle(fontSize: 14, color: Colors.redAccent)),
+                  child: Text('Clear Photo', style: getBaseTextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.redAccent)),
                 ),
               ],
             ),
           ],
-          TextFormField(
-            initialValue: block.caption,
-            textAlign: TextAlign.center,
-            style: getBaseTextStyle(fontSize: 15, fontStyle: FontStyle.italic, color: Colors.grey.shade700),
-            decoration: const InputDecoration(
-              hintText: 'Add photo caption (optional)',
-              isDense: true,
-              border: InputBorder.none,
-              contentPadding: EdgeInsets.symmetric(vertical: 2),
+          if (block.caption.isNotEmpty || !isCleanMode)
+            TextFormField(
+              initialValue: block.caption,
+              textAlign: TextAlign.center,
+              style: getBaseTextStyle(fontSize: 13, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+              decoration: const InputDecoration(
+                hintText: 'Add photo caption (optional)',
+                isDense: true,
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.symmetric(vertical: 2),
+              ),
+              onChanged: (val) {
+                block.caption = val;
+                onUpdateBlock(block);
+              },
             ),
-            onChanged: (val) {
-              block.caption = val;
-              onUpdateBlock(block);
-            },
-          ),
         ],
       );
     }
 
     if (block is QuoteBlock) {
       return Container(
-        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
-        decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          border: const Border(left: BorderSide(color: Colors.black87, width: 3)),
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: const BoxDecoration(
+          color: Color(0xFFF7F7F6),
+          border: Border(left: BorderSide(color: Colors.black87, width: 3)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -550,7 +562,7 @@ class ReceiptCanvas extends StatelessWidget {
               initialValue: block.quote,
               maxLines: null,
               keyboardType: TextInputType.multiline,
-              style: getBaseTextStyle(fontSize: 17.5, fontStyle: FontStyle.italic, fontWeight: FontWeight.w600, height: 1.45),
+              style: getBaseTextStyle(fontSize: 15.5, fontStyle: FontStyle.italic, fontWeight: FontWeight.w700, height: 1.35),
               decoration: const InputDecoration(
                 isDense: true,
                 border: InputBorder.none,
@@ -561,12 +573,12 @@ class ReceiptCanvas extends StatelessWidget {
                 onUpdateBlock(block);
               },
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             TextFormField(
               key: ValueKey('${block.id}_a_${block.author}'),
               initialValue: '— ${block.author}',
               textAlign: TextAlign.right,
-              style: getBaseTextStyle(fontSize: 15.5, fontWeight: FontWeight.bold, color: Colors.grey.shade800),
+              style: getBaseTextStyle(fontSize: 13.5, fontWeight: FontWeight.w800, color: Colors.grey.shade800),
               decoration: const InputDecoration(
                 isDense: true,
                 border: InputBorder.none,
@@ -583,7 +595,7 @@ class ReceiptCanvas extends StatelessWidget {
     }
 
     if (block is GapBlock) {
-      final isSelected = block.id == selectedBlockId;
+      final isSelected = !isCleanMode && block.id == selectedBlockId;
       return Column(
         children: [
           SizedBox(height: block.height),
@@ -597,12 +609,12 @@ class ReceiptCanvas extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text('Gap: ${block.height.toInt()}px', style: getBaseTextStyle(fontSize: 13, color: Colors.black54)),
+                  Text('Gap: ${block.height.toInt()}px', style: getBaseTextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.black54)),
                   const SizedBox(width: 8),
                   InkWell(
                     onTap: () {
-                      if (block.height > 8) {
-                        block.height -= 8;
+                      if (block.height > 4) {
+                        block.height -= 4;
                         onUpdateBlock(block);
                       }
                     },
@@ -611,8 +623,8 @@ class ReceiptCanvas extends StatelessWidget {
                   const SizedBox(width: 6),
                   InkWell(
                     onTap: () {
-                      if (block.height < 96) {
-                        block.height += 8;
+                      if (block.height < 64) {
+                        block.height += 4;
                         onUpdateBlock(block);
                       }
                     },
@@ -635,7 +647,7 @@ class ReceiptCanvas extends StatelessWidget {
               Expanded(
                 child: TextFormField(
                   initialValue: block.title,
-                  style: getBaseTextStyle(fontSize: 17.5, fontWeight: FontWeight.bold),
+                  style: getBaseTextStyle(fontSize: 15.5, fontWeight: FontWeight.w900),
                   decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                   onChanged: (val) {
                     block.title = val;
@@ -644,11 +656,11 @@ class ReceiptCanvas extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: 90,
+                width: 85,
                 child: TextFormField(
                   initialValue: block.date,
                   textAlign: TextAlign.right,
-                  style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+                  style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
                   decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                   onChanged: (val) {
                     block.date = val;
@@ -661,14 +673,14 @@ class ReceiptCanvas extends StatelessWidget {
           const Divider(thickness: 1, color: Colors.black87),
           ...block.items.map((item) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 3),
+              padding: const EdgeInsets.symmetric(vertical: 2),
               child: Row(
                 children: [
                   Expanded(
                     flex: 4,
                     child: TextFormField(
                       initialValue: item.name,
-                      style: getBaseTextStyle(fontSize: 16.5),
+                      style: getBaseTextStyle(fontSize: 14.5, fontWeight: FontWeight.w600),
                       decoration: const InputDecoration(
                         isDense: true,
                         border: InputBorder.none,
@@ -681,11 +693,11 @@ class ReceiptCanvas extends StatelessWidget {
                     ),
                   ),
                   SizedBox(
-                    width: 60,
+                    width: 55,
                     child: TextFormField(
                       initialValue: item.category,
                       textAlign: TextAlign.center,
-                      style: getBaseTextStyle(fontSize: 14, color: Colors.grey.shade600),
+                      style: getBaseTextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
                       decoration: const InputDecoration(
                         isDense: true,
                         border: InputBorder.none,
@@ -702,7 +714,7 @@ class ReceiptCanvas extends StatelessWidget {
                     child: TextFormField(
                       initialValue: '${block.currency}${item.amount.toStringAsFixed(2)}',
                       textAlign: TextAlign.right,
-                      style: getBaseTextStyle(fontSize: 16.5, fontWeight: FontWeight.w600),
+                      style: getBaseTextStyle(fontSize: 14.5, fontWeight: FontWeight.w800),
                       decoration: const InputDecoration(
                         isDense: true,
                         border: InputBorder.none,
@@ -718,55 +730,57 @@ class ReceiptCanvas extends StatelessWidget {
                       },
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      block.items.removeWhere((i) => i.id == item.id);
-                      onUpdateBlock(block);
-                    },
-                    child: const Padding(
-                      padding: EdgeInsets.only(left: 4),
-                      child: Icon(Icons.close, size: 12, color: Colors.black38),
+                  if (!isCleanMode)
+                    InkWell(
+                      onTap: () {
+                        block.items.removeWhere((i) => i.id == item.id);
+                        onUpdateBlock(block);
+                      },
+                      child: const Padding(
+                        padding: EdgeInsets.only(left: 4),
+                        child: Icon(Icons.close, size: 12, color: Colors.black38),
+                      ),
                     ),
-                  ),
                 ],
               ),
             );
           }),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () {
-                block.items.add(
-                  ExpenseItem(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    name: 'Expense Item',
-                    category: 'General',
-                    amount: 5.00,
-                  ),
-                );
-                onUpdateBlock(block);
-              },
-              icon: const Icon(Icons.add, size: 14, color: Colors.black54),
-              label: Text('+ Add Item', style: getBaseTextStyle(fontSize: 15, color: Colors.black54)),
-              style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 24)),
+          if (!isCleanMode)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () {
+                  block.items.add(
+                    ExpenseItem(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      name: 'Expense Item',
+                      category: 'General',
+                      amount: 5.00,
+                    ),
+                  );
+                  onUpdateBlock(block);
+                },
+                icon: const Icon(Icons.add, size: 13, color: Colors.black54),
+                label: Text('+ Add Item', style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black54)),
+                style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 22)),
+              ),
             ),
-          ),
           const Divider(thickness: 1.5, color: Colors.black),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('SUBTOTAL', style: getBaseTextStyle(fontSize: 15, color: Colors.grey.shade700)),
+              Text('SUBTOTAL', style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey.shade700)),
               Text('${block.currency}${block.subtotal.toStringAsFixed(2)}',
-                  style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+                  style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.w800)),
             ],
           ),
           const SizedBox(height: 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('TOTAL EXPENSES', style: getBaseTextStyle(fontSize: 17.5, fontWeight: FontWeight.bold)),
+              Text('TOTAL EXPENSES', style: getBaseTextStyle(fontSize: 15.5, fontWeight: FontWeight.w900)),
               Text('${block.currency}${block.total.toStringAsFixed(2)}',
-                  style: getBaseTextStyle(fontSize: 18.5, fontWeight: FontWeight.bold)),
+                  style: getBaseTextStyle(fontSize: 16.5, fontWeight: FontWeight.w900)),
             ],
           ),
         ],
@@ -790,8 +804,8 @@ class ReceiptCanvas extends StatelessWidget {
                   child: TextFormField(
                     initialValue: block.tag,
                     style: getBaseTextStyle(
-                      fontSize: 14.5,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 12.5,
+                      fontWeight: FontWeight.w900,
                       color: const Color(0xFFF59E0B),
                     ),
                     decoration: const InputDecoration(isDense: true, border: InputBorder.none),
@@ -809,8 +823,8 @@ class ReceiptCanvas extends StatelessWidget {
               initialValue: block.title,
               maxLines: null,
               style: getBaseTextStyle(
-                fontSize: 19,
-                fontWeight: FontWeight.bold,
+                fontSize: 17,
+                fontWeight: FontWeight.w900,
                 color: Colors.white,
                 height: 1.25,
               ),
@@ -826,9 +840,10 @@ class ReceiptCanvas extends StatelessWidget {
               maxLines: null,
               keyboardType: TextInputType.multiline,
               style: getBaseTextStyle(
-                fontSize: 16.5,
+                fontSize: 14.5,
+                fontWeight: FontWeight.w700,
                 color: Colors.white,
-                height: 1.4,
+                height: 1.35,
               ),
               decoration: const InputDecoration(isDense: true, border: InputBorder.none),
               onChanged: (val) {
@@ -840,9 +855,9 @@ class ReceiptCanvas extends StatelessWidget {
             TextFormField(
               initialValue: block.footer,
               style: getBaseTextStyle(
-                fontSize: 13.5,
-                fontWeight: FontWeight.bold,
-                color: Colors.white54,
+                fontSize: 11.5,
+                fontWeight: FontWeight.w800,
+                color: Colors.white70,
               ),
               decoration: const InputDecoration(isDense: true, border: InputBorder.none),
               onChanged: (val) {
@@ -866,7 +881,7 @@ class ReceiptCanvas extends StatelessWidget {
                 child: TextFormField(
                   initialValue: block.title,
                   maxLines: null,
-                  style: getBaseTextStyle(fontSize: 17.5, fontWeight: FontWeight.bold),
+                  style: getBaseTextStyle(fontSize: 15.5, fontWeight: FontWeight.w900),
                   decoration: const InputDecoration(
                     isDense: true,
                     border: InputBorder.none,
@@ -879,11 +894,11 @@ class ReceiptCanvas extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: 90,
+                width: 85,
                 child: TextFormField(
                   initialValue: block.date,
                   textAlign: TextAlign.right,
-                  style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.grey.shade700),
+                  style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
                   decoration: const InputDecoration(
                     isDense: true,
                     border: InputBorder.none,
@@ -900,7 +915,7 @@ class ReceiptCanvas extends StatelessWidget {
           const Divider(thickness: 1.5, color: Colors.black87),
           ...block.items.map((item) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
+              padding: const EdgeInsets.symmetric(vertical: 3),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -925,9 +940,10 @@ class ReceiptCanvas extends StatelessWidget {
                       maxLines: null,
                       keyboardType: TextInputType.multiline,
                       style: getBaseTextStyle(
-                        fontSize: 16.5,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
                         color: item.done ? Colors.grey.shade400 : Colors.black87,
-                        height: 1.35,
+                        height: 1.3,
                       ).copyWith(
                         decoration: item.done ? TextDecoration.lineThrough : null,
                       ),
@@ -948,7 +964,7 @@ class ReceiptCanvas extends StatelessWidget {
                     child: TextFormField(
                       initialValue: item.time,
                       textAlign: TextAlign.right,
-                      style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey.shade700),
+                      style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.grey.shade700),
                       decoration: const InputDecoration(
                         isDense: true,
                         border: InputBorder.none,
@@ -964,24 +980,25 @@ class ReceiptCanvas extends StatelessWidget {
               ),
             );
           }),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () {
-                block.items.add(
-                  ScheduleItem(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    time: '12:00 PM',
-                    title: 'New Agenda Event',
-                  ),
-                );
-                onUpdateBlock(block);
-              },
-              icon: const Icon(Icons.add, size: 14, color: Colors.black54),
-              label: Text('+ Add Event', style: getBaseTextStyle(fontSize: 15, color: Colors.black54)),
-              style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 24)),
+          if (!isCleanMode)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () {
+                  block.items.add(
+                    ScheduleItem(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      time: '12:00 PM',
+                      title: 'New Agenda Event',
+                    ),
+                  );
+                  onUpdateBlock(block);
+                },
+                icon: const Icon(Icons.add, size: 13, color: Colors.black54),
+                label: Text('+ Add Event', style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black54)),
+                style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 22)),
+              ),
             ),
-          ),
         ],
       );
     }
@@ -998,7 +1015,7 @@ class ReceiptCanvas extends StatelessWidget {
                 child: TextFormField(
                   initialValue: block.title,
                   maxLines: null,
-                  style: getBaseTextStyle(fontSize: 17.5, fontWeight: FontWeight.bold),
+                  style: getBaseTextStyle(fontSize: 15.5, fontWeight: FontWeight.w900),
                   decoration: const InputDecoration(
                     isDense: true,
                     border: InputBorder.none,
@@ -1012,14 +1029,14 @@ class ReceiptCanvas extends StatelessWidget {
               ),
               Text(
                 '$completed/${block.items.length}',
-                style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.grey.shade600),
+                style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.w800, color: Colors.grey.shade600),
               ),
             ],
           ),
           const Divider(thickness: 1, color: Colors.black87),
           ...block.items.map((task) {
             return Padding(
-              padding: const EdgeInsets.symmetric(vertical: 4),
+              padding: const EdgeInsets.symmetric(vertical: 3),
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -1044,9 +1061,10 @@ class ReceiptCanvas extends StatelessWidget {
                       maxLines: null,
                       keyboardType: TextInputType.multiline,
                       style: getBaseTextStyle(
-                        fontSize: 16.5,
+                        fontSize: 14.5,
+                        fontWeight: FontWeight.w600,
                         color: task.done ? Colors.grey.shade400 : Colors.black87,
-                        height: 1.35,
+                        height: 1.3,
                       ).copyWith(
                         decoration: task.done ? TextDecoration.lineThrough : null,
                       ),
@@ -1076,10 +1094,10 @@ class ReceiptCanvas extends StatelessWidget {
                       ),
                       child: Text(
                         task.isHighPriority ? 'HIGH' : 'LOW',
-                        style: TextStyle(
-                          fontSize: 13,
-                          fontWeight: FontWeight.bold,
-                          color: task.isHighPriority ? Colors.white : Colors.black,
+                        style: const TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
                         ),
                       ),
                     ),
@@ -1088,23 +1106,24 @@ class ReceiptCanvas extends StatelessWidget {
               ),
             );
           }),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: () {
-                block.items.add(
-                  TodoItem(
-                    id: DateTime.now().millisecondsSinceEpoch.toString(),
-                    text: 'New checklist task',
-                  ),
-                );
-                onUpdateBlock(block);
-              },
-              icon: const Icon(Icons.add, size: 14, color: Colors.black54),
-              label: Text('+ Add Task', style: getBaseTextStyle(fontSize: 15, color: Colors.black54)),
-              style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 24)),
+          if (!isCleanMode)
+            Align(
+              alignment: Alignment.centerLeft,
+              child: TextButton.icon(
+                onPressed: () {
+                  block.items.add(
+                    TodoItem(
+                      id: DateTime.now().millisecondsSinceEpoch.toString(),
+                      text: 'New checklist task',
+                    ),
+                  );
+                  onUpdateBlock(block);
+                },
+                icon: const Icon(Icons.add, size: 13, color: Colors.black54),
+                label: Text('+ Add Task', style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.black54)),
+                style: TextButton.styleFrom(padding: EdgeInsets.zero, minimumSize: const Size(50, 22)),
+              ),
             ),
-          ),
         ],
       );
     }
@@ -1118,7 +1137,7 @@ class ReceiptCanvas extends StatelessWidget {
                 flex: 3,
                 child: TextFormField(
                   initialValue: block.headers[0],
-                  style: getBaseTextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+                  style: getBaseTextStyle(fontSize: 14.5, fontWeight: FontWeight.w900),
                   decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                   onChanged: (val) {
                     block.headers[0] = val;
@@ -1131,7 +1150,7 @@ class ReceiptCanvas extends StatelessWidget {
                 child: TextFormField(
                   initialValue: block.headers[1],
                   textAlign: TextAlign.center,
-                  style: getBaseTextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+                  style: getBaseTextStyle(fontSize: 14.5, fontWeight: FontWeight.w900),
                   decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                   onChanged: (val) {
                     block.headers[1] = val;
@@ -1144,7 +1163,7 @@ class ReceiptCanvas extends StatelessWidget {
                 child: TextFormField(
                   initialValue: block.headers[2],
                   textAlign: TextAlign.right,
-                  style: getBaseTextStyle(fontSize: 16.5, fontWeight: FontWeight.bold),
+                  style: getBaseTextStyle(fontSize: 14.5, fontWeight: FontWeight.w900),
                   decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                   onChanged: (val) {
                     block.headers[2] = val;
@@ -1162,7 +1181,7 @@ class ReceiptCanvas extends StatelessWidget {
                   flex: 3,
                   child: TextFormField(
                     initialValue: row[0],
-                    style: getBaseTextStyle(fontSize: 16),
+                    style: getBaseTextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                     decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                     onChanged: (val) {
                       row[0] = val;
@@ -1175,7 +1194,7 @@ class ReceiptCanvas extends StatelessWidget {
                   child: TextFormField(
                     initialValue: row[1],
                     textAlign: TextAlign.center,
-                    style: getBaseTextStyle(fontSize: 16),
+                    style: getBaseTextStyle(fontSize: 14, fontWeight: FontWeight.w600),
                     decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                     onChanged: (val) {
                       row[1] = val;
@@ -1188,7 +1207,7 @@ class ReceiptCanvas extends StatelessWidget {
                   child: TextFormField(
                     initialValue: row[2],
                     textAlign: TextAlign.right,
-                    style: getBaseTextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: getBaseTextStyle(fontSize: 14, fontWeight: FontWeight.w700),
                     decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                     onChanged: (val) {
                       row[2] = val;
@@ -1206,7 +1225,7 @@ class ReceiptCanvas extends StatelessWidget {
               Expanded(
                 child: TextFormField(
                   initialValue: block.totalLabel,
-                  style: getBaseTextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.w900),
                   decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                   onChanged: (val) {
                     block.totalLabel = val;
@@ -1215,11 +1234,11 @@ class ReceiptCanvas extends StatelessWidget {
                 ),
               ),
               SizedBox(
-                width: 90,
+                width: 85,
                 child: TextFormField(
                   initialValue: block.totalValue,
                   textAlign: TextAlign.right,
-                  style: getBaseTextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                  style: getBaseTextStyle(fontSize: 15, fontWeight: FontWeight.w900),
                   decoration: const InputDecoration(isDense: true, border: InputBorder.none),
                   onChanged: (val) {
                     block.totalValue = val;
@@ -1238,7 +1257,7 @@ class ReceiptCanvas extends StatelessWidget {
         child: Column(
           children: [
             Container(
-              padding: const EdgeInsets.all(6),
+              padding: const EdgeInsets.all(4),
               color: Colors.white,
               child: QrImageView(
                 data: block.data,
@@ -1246,11 +1265,11 @@ class ReceiptCanvas extends StatelessWidget {
                 size: block.size,
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 2),
             TextFormField(
               initialValue: block.data,
               textAlign: TextAlign.center,
-              style: getBaseTextStyle(fontSize: 14.5, color: Colors.grey.shade600),
+              style: getBaseTextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: Colors.grey.shade600),
               decoration: const InputDecoration(isDense: true, border: InputBorder.none),
               onChanged: (val) {
                 block.data = val;
@@ -1260,7 +1279,7 @@ class ReceiptCanvas extends StatelessWidget {
             TextFormField(
               initialValue: block.label,
               textAlign: TextAlign.center,
-              style: getBaseTextStyle(fontSize: 15.5, fontWeight: FontWeight.bold),
+              style: getBaseTextStyle(fontSize: 13.5, fontWeight: FontWeight.w900),
               decoration: const InputDecoration(isDense: true, border: InputBorder.none),
               onChanged: (val) {
                 block.label = val;
@@ -1274,24 +1293,28 @@ class ReceiptCanvas extends StatelessWidget {
 
     if (block is DividerBlock) {
       return Padding(
-        padding: const EdgeInsets.symmetric(vertical: 6),
+        padding: const EdgeInsets.symmetric(vertical: 4),
         child: Text(
           block.style == 'stars'
               ? '* * * * * * * * * * * * * * * * * * *'
               : '- - - - - - - - - ✂ - - - - - - - - -',
           textAlign: TextAlign.center,
-          style: getBaseTextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+          style: getBaseTextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),
       );
     }
 
     if (block is FeedBlock) {
+      final double feedHeight = (block.lines * 14.0).clamp(16.0, 140.0);
+      if (isCleanMode) {
+        return SizedBox(height: feedHeight);
+      }
       return SizedBox(
-        height: (block.lines * 16.0).clamp(24.0, 160.0),
+        height: feedHeight,
         child: Center(
           child: Text(
             '-- FEED / TEAR SPACE (${block.lines} lines) --',
-            style: getBaseTextStyle(fontSize: 14, color: Colors.grey.shade400),
+            style: getBaseTextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey.shade400),
           ),
         ),
       );
