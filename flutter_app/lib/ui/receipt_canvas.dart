@@ -320,20 +320,13 @@ class ReceiptCanvas extends StatelessWidget {
               ),
             ),
 
-            // Bottom zigzag tear-off effect
+            // Bottom paper roll finished edge
             Container(
               width: displayWidth,
-              height: 12,
+              height: 6,
               decoration: const BoxDecoration(
-                color: Color(0xFFF0F0ED),
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(4)),
-              ),
-              child: Center(
-                child: Text(
-                  '- - - - - - - - - - - - ✂ - - - - - - - - - - - -',
-                  style: getBaseTextStyle(fontSize: 13, fontWeight: FontWeight.bold, color: Colors.grey.shade500),
-                  overflow: TextOverflow.clip,
-                ),
+                color: Color(0xFFE4E4E7),
+                borderRadius: BorderRadius.vertical(bottom: Radius.circular(3)),
               ),
             ),
           ],
@@ -1297,7 +1290,7 @@ class ReceiptCanvas extends StatelessWidget {
         child: Text(
           block.style == 'stars'
               ? '* * * * * * * * * * * * * * * * * * *'
-              : '- - - - - - - - - ✂ - - - - - - - - -',
+              : '- - - - - - - - - - - - - - - - - - -',
           textAlign: TextAlign.center,
           style: getBaseTextStyle(fontSize: 14, fontWeight: FontWeight.bold),
         ),

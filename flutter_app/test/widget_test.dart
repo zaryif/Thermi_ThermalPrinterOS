@@ -96,5 +96,15 @@ void main() {
     expect(find.text('+ Add Event'), findsNothing);
     expect(find.byIcon(Icons.delete_outline), findsNothing);
     expect(find.textContaining('FEED / TEAR SPACE'), findsNothing);
+    expect(find.textContaining('✂'), findsNothing);
+  });
+
+  testWidgets('Default template contains no feed tear blocks and no scissor cuts', (WidgetTester tester) async {
+    SharedPreferences.setMockInitialValues({'has_seen_onboarding_v1': true});
+    await tester.pumpWidget(const ThermalStudioApp());
+    await tester.pumpAndSettle();
+
+    expect(find.textContaining('✂'), findsNothing);
+    expect(find.textContaining('FEED / TEAR SPACE'), findsNothing);
   });
 }

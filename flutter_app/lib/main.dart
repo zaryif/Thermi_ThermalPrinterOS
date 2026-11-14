@@ -136,9 +136,6 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
           TodoItem(id: 't3', text: 'Verify responsive edge-to-edge canvas width'),
         ],
       ),
-      GapBlock(id: 'gap_4', height: 8),
-      DividerBlock(id: 'div_1', style: 'cut'),
-      FeedBlock(id: 'fd_1', lines: 3),
     ]);
   }
 
@@ -185,9 +182,6 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
               fontSize: 12,
               align: TextAlign.center,
             ),
-            GapBlock(id: 'gap_e3', height: 6),
-            DividerBlock(id: 'div_e', style: 'cut'),
-            FeedBlock(id: 'fd_e', lines: 3),
           ]);
           break;
 
@@ -214,9 +208,6 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
               author: 'Edsger W. Dijkstra',
               category: 'Engineering',
             ),
-            GapBlock(id: 'gap_n3', height: 6),
-            DividerBlock(id: 'div_n', style: 'cut'),
-            FeedBlock(id: 'fd_n', lines: 3),
           ]);
           break;
 
@@ -241,9 +232,6 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
                 TodoItem(id: 't4', text: 'Deploy release to GitHub'),
               ],
             ),
-            GapBlock(id: 'gap_t2', height: 6),
-            DividerBlock(id: 'div_t', style: 'cut'),
-            FeedBlock(id: 'fd_t', lines: 3),
           ]);
           break;
 
@@ -271,9 +259,6 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
               data: 'https://github.com/zaryif/Thermi_ThermalPrinterOS',
               label: 'SCAN FOR SYSTEM REPO',
             ),
-            GapBlock(id: 'gap_i3', height: 6),
-            DividerBlock(id: 'div_imp', style: 'cut'),
-            FeedBlock(id: 'fd_imp', lines: 3),
           ]);
           break;
 
@@ -420,7 +405,7 @@ class _ThermalStudioScreenState extends State<ThermalStudioScreen> {
         );
         break;
       case 'divider':
-        newBlock = DividerBlock(id: newId, style: 'cut');
+        newBlock = DividerBlock(id: newId, style: 'dashed');
         break;
       case 'feed':
       default:
